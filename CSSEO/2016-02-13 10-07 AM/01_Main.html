@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <url>
+   http://bhanupriya.me
+  </url>
+  <title>Bhanupriya Sharma</title> 
+  <link rel="shortcut icon" type="image/x-icon" href="http://bhanupriya.me/favicon.ico?" /> 
+  <script src="http://code.jquery.com/jquery-latest.min.js"> </script> 
+  <!--<script src="js/jquery.min.js"> </script>--> 
+  <link href="css/bootstrap.css" rel="stylesheet" type="text/css" /> 
+  <link href="css/style.css" rel="stylesheet" type="text/css" media="all" /> 
+  <link href="http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900" rel="stylesheet" type="text/css" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+  <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script> 
+  <!-- start-smoth-scrolling----> 
+  <script type="text/javascript" src="js/move-top.js"></script> 
+  <script type="text/javascript" src="js/easing.js"></script> 
+  <script type="text/javascript">
+			jQuery(document).ready(function($) {
+				$(".scroll").click(function(event){		
+					event.preventDefault();
+					$('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
+				});
+				$("#send").click(function() {
+					var name = $("#name").val();
+					var email = $("#email").val();
+					var message = $("#msg").val();
+					$("#returnmessage").empty(); // To empty previous error/success message.
+					// Checking for blank fields.
+					if (name == '' || email == '' || msg == '') {
+						$("#returnmessage").append("Please Fill Required Fields");
+					} else {
+						$("#returnmessage").append("sending...");
+						$.ajax({
+							type: "POST",
+							url: "_process/contact.php",
+							data: "name="+name+"&email="+email+"&message="+message,
+							success: function(msg){
+                                                                $("#returnmessage").empty();
+							        $("#returnmessage").append(msg); // Append returned message to message paragraph.
+							        if (msg == "Thank you, I will contact you soon.") {
+								       $("#contactForm")[0].reset(); // To reset form fields on success.
+							        }
+						  },
+						  error: function(XMLHttpRequest, textStatus, errorThrown) {
+                                                         $("#returnmessage").empty();
+							 $("#returnmessage").append(textStatus);
+						  }
+						});
+					}
+				});
+			});
+		</script> 
+  <!-- start-smoth-scrolling----> 
+ </head> 
+ <body> 
+  <!--headerbg starts---------> 
+  <div id="top-top" class="headerbg"> 
+   <!--header starts---------> 
+   <div class="header"> 
+    <!--container starts---------> 
+    <div class="container"> 
+     <div class="logo"> 
+      <a href="BhanupriyaSharma.docx">Resume</a> 
+     </div> 
+     <!--Navigation starts---------> 
+     <div class="nav"> 
+      <ul> 
+       <li><a class="scroll" href="#about">ABOUT</a></li> 
+       <li><a class="scroll" href="#skills">SKILLS</a></li> 
+       <li><a class="scroll" href="#port">PROJECTS</a></li> 
+       <li><a class="scroll" href="#contact">CONTACT</a></li> 
+      </ul> 
+     </div> 
+     <!--Navigation ends--------> 
+     <div class="clear"></div> 
+    </div> 
+    <!--container ends---------> 
+   </div> 
+   <!--header ends---------> 
+   <!--Banner starts---------> 
+   <div class="banner"> 
+    <div class="container"> 
+     <div class="banner-info"> 
+      <div class="bannerlogo"> 
+       <img src="images/diamond.png" /> 
+      </div> 
+      <div class="bannerhead"> 
+       <h2>My name is <span>Bhanupriya Sharma</span></h2> 
+       <h3>Java Developer</h3> 
+       <p>Recent college graduate with website development knowledge, including database design, strong conceptual and technical skills.</p> 
+       <a class="downarrow scroll" href="#about"><span> </span></a> 
+      </div> 
+     </div> 
+     <div class="clear"></div> 
+    </div> 
+   </div> 
+   <!--Banner ends--------> 
+  </div> 
+  <!--Headerbg ends--------> 
+  <!--Content starts---------> 
+  <div class="content"> 
+   <!--About starts---------> 
+   <div id="about" class="about"> 
+    <div class="container"> 
+     <div class="header-section text-center"> 
+      <h2><span> </span>ABOUT<span> </span></h2> 
+     </div> 
+     <span><p>I'm Bhanupriya Sharma. I am doing Masters in Computer Science from California State University Los Angeles. I am motivated, customer-oriented and a Java Developer with website development knowledge, including database design, strong conceptual and technical skills.</p></span> 
+     <div class="years"> 
+      <h4><b>2014 - Present</b></h4> 
+      <span><h4>Masters in Computer Science</h4></span> 
+      <h5>California State University Los Angeles - CA</h5> 
+      <p>As part of Major, I have worked on below projects...</p>
+      <br /> 
+      <h5>
+       <ul> 
+        <u><b>Search Engine</b></u> - 
+        <i>Java, Tika, Jsoup </i>
+        <br />
+        <br /> 
+        <u><b>Golden Eagle Flight Plan</b></u> - 
+        <i>J2EE, Spring MVC, Hibernate, PostgreSQL, Apache Tomcat 7.0</i>
+        <br />
+        <br /> 
+        <u><b>Zip code locator</b></u> - 
+        <i>Google APIs, java servlets, JSPs, custom tags and phpMyAdmin</i>
+        <br />
+        <br /> 
+        <u><b>Library Management System</b></u> - 
+        <i>Database design using PostgreSQL</i>
+        <br />
+        <br /> 
+        <u><b>Custom map using OSM</b></u> - 
+        <i>Core JAVA, JDK 1.6</i>
+        <br />
+        <br /> 
+        <u><b>Mock Test</b></u> - 
+        <i>JSP, Servlet, MySQL</i>
+        <br />
+        <br /> 
+        <u><b>Trivia Quiz</b></u> - 
+        <i>JSP, Servlet, phpMyAdmin</i>
+        <br />
+        <br /> 
+        <u><b>Online Voting System</b></u> - 
+        <i>Cryptography, socket programming, core java</i>
+        <br />
+        <br /> 
+        <u><b>Mobility module in Mars Rover Simulation project</b></u> - 
+        <i>Played Team Leader role, SDLC , Rover Movement Calculator and data collector</i>
+        <br />
+        <br /> 
+       </ul></h5> 
+     </div> 
+     <a class="arrow scroll" href="#skills"><span> </span></a> 
+    </div> 
+    <div class="clear"></div> 
+   </div> 
+   <!--About Ends---------> 
+   <!--SKILLS Starts---------> 
+   <div id="skills" class="skills"> 
+    <div class="container"> 
+     <div class="skills-grids"> 
+      <div class="skill-section text-center"> 
+       <h2><span> </span>SKILLS<span> </span></h2> 
+      </div> 
+      <div class="services_grids"> 
+       <div id="canvas"> 
+        <div class="skill-grids text-center"> 
+         <div class="col-md-3"> 
+          <div class="skill-grid"> 
+           <div class="circle" id="circles-1" per="60"></div> 
+           <h3>Java</h3> 
+          </div> 
+         </div> 
+         <div class="col-md-3"> 
+          <div class="skill-grid"> 
+           <div class="circle" id="circles-2" per="50"></div> 
+           <h3>MySQL</h3> 
+          </div> 
+         </div> 
+         <div class="col-md-3"> 
+          <div class="skill-grid"> 
+           <div class="circle" id="circles-3" per="70"></div> 
+           <h3>Spring MVC</h3> 
+          </div> 
+         </div> 
+         <div class="col-md-3"> 
+          <div class="skill-grid"> 
+           <div class="circle" id="circles-4" per="50"></div> 
+           <h3>Hibernate</h3> 
+          </div> 
+         </div> 
+         <div class="clearfix"> 
+         </div> 
+         <div class="col-md-3"> 
+          <div class="skill-grid"> 
+           <div class="circle" id="circles-5" per="70"></div> 
+           <h3>AngularJS</h3> 
+          </div> 
+         </div> 
+         <div class="col-md-3"> 
+          <div class="skill-grid"> 
+           <div class="circle" id="circles-6" per="70"></div> 
+           <h3>NodeJS</h3> 
+          </div> 
+         </div> 
+         <div class="col-md-3"> 
+          <div class="skill-grid"> 
+           <div class="circle" id="circles-7" per="40"></div> 
+           <h3>Ajax</h3> 
+          </div> 
+         </div> 
+         <div class="col-md-3"> 
+          <div class="skill-grid"> 
+           <div class="circle" id="circles-8" per="50"></div> 
+           <h3>JAVASCRIPT</h3> 
+          </div> 
+         </div> 
+         <!--<div class="clearfix"> </div> --> 
+         <div class="clear"></div> 
+        </div> 
+       </div> 
+      </div> 
+      <!----> 
+      <script type="text/javascript" src="js/circles.js"></script> 
+      <script>
+									for (var i = 1; i <= 20; i++) {
+										var child = document.getElementById('circles-' + i)
+										var percentage = child.attributes["per"].value;
+											
+										Circles.create({
+											id:         child.id,
+											percentage: percentage,
+											radius:     50,
+											width:      10,
+											number:   	percentage,
+											text:       '%',
+											colors:     ['#666666','#181115']
+										});
+									}
+							
+					</script> 
+      <!--/--> 
+     </div> 
+    </div> 
+    <a class="down scroll" href="#port"><span> </span></a> 
+   </div> 
+   <!--SKILLS Ends---------> 
+   <!--PORTFOLIO Starts---------> 
+   <div id="port" class="Portfolio"> 
+    <div class="Portfolio-section text-center"> 
+     <h2><span> </span>PROJECTS<span> </span></h2> 
+    </div> 
+    <div class="container"> 
+     <div class="portfolio-grids"> 
+      <div class="portfolio-grid col-md-4"> 
+       <a href="#port"><img src="images/monitr1.png" /></a>
+       <br /> 
+       <h4>Angular JS</h4> and Node JS 
+       <p>An Assignment System using SPA, Angular.js and Node.js where admin can enroll students into classes and create tasks to assign to students.</p> 
+       <!--<a class="rightarrow" href="#"><span> </span></a>--> 
+      </div> 
+      <div class="portfolio-grid col-md-4"> 
+       <a href="#port"><img src="images/monitr2.png" /></a>
+       <br /> 
+       <h4>Spring MVC</h4> and hibernate 
+       <p>Golden Eagle Flight Plan using Spring MVC and Hibernate where multiple departments can create/change plan for any major and then publish latest changes.</p> 
+       <!--<a class="rightarrow" href="#"><span> </span></a>--> 
+      </div> 
+      <div class="portfolio-grid col-md-4"> 
+       <a href="#port"><img src="images/monitr3.png" /></a>
+       <br /> 
+       <h4>Zip code Locator</h4>using Google API 
+       <p>Online system using Google API where user can add friends and check their location on google map along with their distance.</p> 
+       <!--<a class="rightarrow" href="#"><span> </span></a>--> 
+      </div> 
+      <div class="clear"> 
+      </div> 
+     </div> 
+     <a class="portdown scroll" href="#contact"><span> </span></a> 
+    </div> 
+    <!--<p class="copy-right">Template by <a href="http://w3layouts.com/" style="color:black">W3layouts</a></p>--> 
+   </div> 
+  </div> 
+  <!--Content Ends--------> 
+  <!--FOOTER Starts-----------> 
+  <div id="contact" class="footer"> 
+   <div class="container"> 
+    <div class="contact-section text-center"> 
+     <h2><span> </span>CONTACT<span> </span></h2> 
+    </div> 
+    <div class="row"> 
+     <div class="col-md-6"> 
+      <div class="footer-left"> 
+       <!--<div class="social-icons">
+						   <a href="#"><img src="images/in.png"></a>
+						   <a href="#"><img src="images/twt.png"></a>
+						   <a href="#"><img src="images/fb.png"></a>
+					   </div>--> 
+       <h2><b>Bhanupriya Sharma</b><br /></h2> 
+       <h3><i>Long Beach, California<br /> phone: 562.200.1422<br /> email: <a href="mailto:contact@bhanupriya.me">contact@bhanupriya.me</a></i></h3> 
+      </div> 
+     </div> 
+     <div class="col-md-6"> 
+      <div class="footer-right"> 
+       <div class="form"> 
+        <form id="contactForm"> 
+         <input id="name" type="text" class="text" placeholder="Name" /> 
+         <input id="email" type="text" class="text" placeholder="E-mail" /> 
+         <textarea id="msg" type="text" class="text" rows="2" cols="70" placeholder="Your Message"></textarea> 
+         <div class="clear"> 
+         </div> 
+         <div>
+          <p style="color:#818184" id="returnmessage"></p>
+         </div> 
+         <input id="send" type="button" value="SEND" /> 
+        </form> 
+       </div> 
+      </div> 
+      <div class="clear"></div> 
+      <p class="copy-right">Template by <a href="http://w3layouts.com/">W3layouts</a></p> 
+     </div> 
+    </div> 
+   </div> 
+   <a class="up scroll" href="#top-top"><span> </span></a> 
+  </div>   
+ </body>
+</html>
