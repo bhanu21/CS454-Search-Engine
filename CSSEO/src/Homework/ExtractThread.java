@@ -3,6 +3,7 @@ package Homework;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -23,94 +24,56 @@ public class ExtractThread extends Thread
 {
 	MongoClient mongoClient;
 	File filePath;
+	String uuid;
 
-	public ExtractThread(File filePath) throws UnknownHostException
-	   {
-	      this.mongoClient = new MongoClient( "localhost" , 27017);;
-	      this.filePath = filePath;
-	   }
+	public ExtractThread(MongoClient mongoClient, File filePath , String uuid) throws UnknownHostException
+   {
+      this.mongoClient = mongoClient;
+      this.filePath = filePath;
+      this.uuid=uuid;
+   }
 
-	   @Override
-	   public void run()
-	   {
-		   try{
-			   System.out.println("extracting: "+filePath);
-				 Document doc = Jsoup.parse(filePath, "UTF-8");
-				 Elements linksOnPage = doc.select("a[href]");
-				 Elements metas = doc.select("META");
-				 Element url = doc.select("url").get(0);
-				
-				
-      	HttpURLConnection content = (HttpURLConnection) new URL(url.html()).openConnection();        
-			
-    
-      	Date Last_update_Date= new Date(content.getLastModified());
-      	
-			
-          Elements media = doc.select("[src]");
-         
-      	Connection connection = Jsoup.connect(url.html());
-			Document htmlDocument = connection
-					.ignoreContentType(true)
-					.get();
-         
+   @Override
+   public void run()
+   {
+	   try{
+		   	System.out.println("extracting: "+filePath);
+		  
+			 Document doc = Jsoup.parse(filePath, "UTF-8");
+			 Elements linksOnPage = doc.select("a[href]");
+			 Elements metas = doc.select("META");
+			 Elements media = doc.select("[src]");
          
 			DB db = mongoClient.getDB( "mydb" );
 			
-			DBCollection collection1=db.getCollection("Crawled_URL");
+			DBCollection collection1=db.getCollection("Extracted_URL");
 		
 			BasicDBObject document = new BasicDBObject();
-			document.put("Base_URL",url.html());
+			//document.put("Base_URL",url.html());
 			document.put("title", doc.title().toString());
-			document.put("html_size",(float)content.getContentLength());
-			document.put("Last_modified",Last_update_Date);
+		//	document.put("html_size",(float)content.getContentLength());
+		//	document.put("Last_modified",Last_update_Date);
 			document.put("Extracted_Date",new Date());
-			document.put("Page_html",htmlDocument.html() );
+		//	document.put("Page_html",htmlDocument.html() );
+			document.put("Page_Location",filePath.getAbsolutePath() );
+			document.put("Uuid",uuid );
 			BasicDBObject documenturl = new BasicDBObject();
 			int l=0;
 			for(Element u : linksOnPage )
 			{
-				if(u.absUrl("href")!="")	{
-				documenturl.put("url"+l,u.absUrl("href").toString());
-				
-				l++;}
+				if(u.absUrl("href")!=""){
+					documenturl.put("url"+l,u.absUrl("href").toString());				
+					l++;
+				}
 			}
 			document.put("outgoing_Links", documenturl);
 			BasicDBObject documenturl1 = new BasicDBObject();
-			int m=0;
-			for(Element u : metas )
-			{
-				if(u.attr("name")!="")	{
-				documenturl1.put(u.attr("name"),u.attr("content").toString());
-				
-				l++;}
-			}
+			documenturl1.put(metas.first().attr("name"), metas.first().attr("content").toString());
 			document.put("Meta_data", documenturl1);
-			
-			BasicDBObject document1 = new BasicDBObject();
-
-			
-          for (Element src : media) {
-              if (src.tagName().equals("img"))
-              {
-              	if(src.attr("abs:src").contains(url.html())){
-              		BasicDBObject document2 = new BasicDBObject();
-              
-              	
-                  HttpURLConnection content1 = (HttpURLConnection) new URL(src.attr("abs:src")).openConnection();
-              
-              	document2.put("image_url",src.attr("abs:src") );
-              	document2.put("image_size",(float)content1.getContentLength() );
-              	document2.put("image_alt",src.attr("alt").trim()) ;
-              	document1.put("image", document2);
-                }                	
-              }
-      	}
-          document.put("images",document1);
+		   
+			BasicDBObject query = new BasicDBObject("Page_Location",filePath.getAbsolutePath());
           
-          BasicDBObject query = new BasicDBObject("Base_URL",url.html());
-          
-          collection1.update(query,document,true,false);
+			collection1.update(query,document,true,false);
   							
 			}
 			catch(Exception e)
@@ -119,10 +82,15 @@ public class ExtractThread extends Thread
 				/*System.out.println("url: "+url);
 				System.out.println("exception: "+e.getMessage());*/
 			} 
-		   finally
-		   {
-			   mongoClient.close();
-		   }
+		  
+	   
+		   /*try {
+			   indexing index=new indexing();			   
+			   index.StopWords(filePath,uuid);
+		   } catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		   }*/
 	   }
 
 }

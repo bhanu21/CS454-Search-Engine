@@ -34,7 +34,7 @@ public class indexing {
 		indexing index = new indexing();
 		HashSet<Pair> words = new HashSet<Pair>();
         Pair pair=index.new Pair();
-		File[] currentfolder=( new File ("C:/Temp/en/articles/5/")).listFiles();
+	//	File[] currentfolder=( new File ("C:/Temp/en/articles/5/")).listFiles();
 		
 		
 			
@@ -42,7 +42,7 @@ public class indexing {
 			 
 			 
 			// index.StopWords(list(new File("C:/Temp/en/")));
-		System.out.println(list(new File("C:/Temp/en/")).size());
+		//System.out.println(list(new File("C:/Temp/en/")).size());
 			index.extracter(list(new File("C:/Temp/en/")));
 			
 			
@@ -62,13 +62,15 @@ public class indexing {
 			ArrayList<ExtractThread> extractThreads= new ArrayList<ExtractThread>();
 			//File[] folder = new File (currentfolder).listFiles();
 			//try{
+			MongoClient mongoClient = new MongoClient( "localhost" , 27017);
 				for(File file : files ){
-					 UUID uu_id = UUID.randomUUID();
-					 String uuid=uu_id.toString();
-					ExtractThread thread= new ExtractThread( file,uuid);
-					extractThreads.add(thread);
-					thread.start();				
+					 	UUID uu_id = UUID.randomUUID();
+					 	String uuid=uu_id.toString();
+					 	ExtractThread thread= new ExtractThread(mongoClient,file,uuid);
+						extractThreads.add(thread);
+						thread.start();				
 					}
+				
 				
 				System.out.println("Total extract thread :" + extractThreads.size());
 				int stillWorking = 1;
@@ -88,6 +90,9 @@ public class indexing {
 					    Thread.currentThread().interrupt();
 					}
 				}
+				
+					mongoClient.close();
+				
 				
 				
 		}
@@ -136,12 +141,12 @@ public class indexing {
 	        return count/temps.size();
 	    }
 	
-	 public void StopWords(List<File> files) throws IOException
+	 public void StopWords(File file,String uuid) throws IOException
 		{
 		 indexing ind=new indexing();
-		 for(File f: files){
+		
 			 	
-				Document doc = Jsoup.parse(f, "UTF-8");
+				Document doc = Jsoup.parse(file, "UTF-8");
 				Element e = doc.select("body").first();
 				Pair pair = new Pair();
 				HashSet<Pair> words = new HashSet<Pair>();
@@ -149,7 +154,7 @@ public class indexing {
 				DB db = mg.getDB( "mydb" );
 				
 				DBCollection collection1=db.getCollection("indices");
-				 File newFile = new File("C:/Users/bps21/Desktop/temp/"+f.getName()+".txt");
+				 File newFile = new File("C:/Users/bps21/Desktop/temp/"+file.getName()+".txt");
 				 String[] ENGLISH_STOP_WORDS ={
 						    "a", "an", "and", "are","as","at","be", "but",
 						    "by", "for", "if", "in", "into", "is", "it",
@@ -158,8 +163,6 @@ public class indexing {
 						    "they", "this", "to", "was", "will", "with" };
 					String text = e.text().toLowerCase();
 					
-					 UUID uu_id = UUID.randomUUID();
-					 String uuid=uu_id.toString();
 				//System.out.println(e.text());
 					 for (String s : ENGLISH_STOP_WORDS)
 					 {
@@ -197,7 +200,7 @@ public class indexing {
 					BasicDBObject document1 = new BasicDBObject();
 					document1.put("UUID", uuid);
 					document1.put("tf_score", ind.tfCalculator(temps, temp,pair,words,uuid));
-					document.put("File"+i, document1);
+					document.put("File", document1);
 					BasicDBObject query = new BasicDBObject("word",temp);
 			          
 			          collection1.update(query,document,true,false);
@@ -206,7 +209,7 @@ public class indexing {
 				}	
 			   
 			}
-		}
+		
 		
 		
 	
