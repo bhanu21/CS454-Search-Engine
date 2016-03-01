@@ -41,7 +41,8 @@ public class indexing {
 			
 			 
 			 
-			 index.StopWords(list(new File("C:/Temp/en/")));
+			// index.StopWords(list(new File("C:/Temp/en/")));
+		System.out.println(list(new File("C:/Temp/en/")).size());
 			index.extracter(list(new File("C:/Temp/en/")));
 			
 			
@@ -55,46 +56,52 @@ public class indexing {
 		  
 		}
 		public void extracter( List<File> files) throws IOException
-		{
-			
-			ArrayList<ExtractThread> extractThreads= new ArrayList<ExtractThread>();
-			File[] currentfolder=( new File ("C:/Temp/en/articles/5/")).listFiles();
-			for(File file : files ){
-				 UUID uu_id = UUID.randomUUID();
-				 String uuid=uu_id.toString();
-			ExtractThread thread= new ExtractThread( file,uuid);
-			extractThreads.add(thread);
-			thread.start();				
-			}
 		
-		System.out.println("Total extract thread :" + extractThreads.size());
-		int stillWorking = 1;
-		while(stillWorking>0)
 		{
-			stillWorking=0;
-			for( ExtractThread thread : extractThreads)
-			{
-				if(thread.isAlive())
-					stillWorking++;
-			}
-			System.out.println("total extract threads alive: "+stillWorking);
-			
-			try {
-			    Thread.sleep(500);
-			} catch(InterruptedException ex) {
-			    Thread.currentThread().interrupt();
-			}
+
+			ArrayList<ExtractThread> extractThreads= new ArrayList<ExtractThread>();
+			//File[] folder = new File (currentfolder).listFiles();
+			//try{
+				for(File file : files ){
+					 UUID uu_id = UUID.randomUUID();
+					 String uuid=uu_id.toString();
+					ExtractThread thread= new ExtractThread( file,uuid);
+					extractThreads.add(thread);
+					thread.start();				
+					}
+				
+				System.out.println("Total extract thread :" + extractThreads.size());
+				int stillWorking = 1;
+				while(stillWorking>0)
+				{
+					stillWorking=0;
+					for( ExtractThread thread : extractThreads)
+					{
+						if(thread.isAlive())
+							stillWorking++;
+					}
+					System.out.println("total extract threads alive: "+stillWorking);
+					
+					try {
+					    Thread.sleep(500);
+					} catch(InterruptedException ex) {
+					    Thread.currentThread().interrupt();
+					}
+				}
+				
+				
 		}
-	}
 	
 	public static List<File> list(File file) {
 	    
 		if(!file.isDirectory())
-			files.add(file);		
+			files.add(file);	
+		else{
 		File[] children = file.listFiles();
 	    for (File child : children) {
 	        list(child);
 	    }
+		}
 		return files;
 	}
 	
