@@ -29,24 +29,23 @@ public class indexing {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
-		list(new File("C:/Temp/en/"));
+		
 		
 		indexing index = new indexing();
 		HashSet<Pair> words = new HashSet<Pair>();
         Pair pair=index.new Pair();
 		File[] currentfolder=( new File ("C:/Temp/en/articles/5/")).listFiles();
-		for(File f: currentfolder)
-		{
+		
 		
 			
-			 UUID uuid = UUID.randomUUID();
+			
 			 
-			 String uu_id=uuid.toString();
-			 index.StopWords(index.GetFolders(f),uu_id);
-			index.extracter(f,uu_id);
+			 
+			 index.StopWords(list(new File("C:/Temp/en/")));
+			index.extracter(list(new File("C:/Temp/en/")));
 			
 			
-		}
+		
 		
 		}
 	 public class Pair{
@@ -55,40 +54,40 @@ public class indexing {
 		  String uuid;
 		  
 		}
-		public void extracter( File file, String uuid) throws IOException
+		public void extracter( List<File> files) throws IOException
 		{
-
+			
 			ArrayList<ExtractThread> extractThreads= new ArrayList<ExtractThread>();
 			File[] currentfolder=( new File ("C:/Temp/en/articles/5/")).listFiles();
-			//try{
-				
-					ExtractThread thread= new ExtractThread( file,uuid);
-					extractThreads.add(thread);
-					thread.start();				
-					
-				
-			//	System.out.println("Total extract thread :" + extractThreads.size());
-				int stillWorking = 1;
-				while(stillWorking>0)
-				{
-					stillWorking=0;
-					for( ExtractThread thread1 : extractThreads)
-					{
-						if(thread1.isAlive())
-							stillWorking++;
-					}
-					//System.out.println("total extract threads alive: "+stillWorking);
-					
-					try {
-					    Thread.sleep(500);
-					} catch(InterruptedException ex) {
-					    Thread.currentThread().interrupt();
-					}
-				}
-				
+			for(File file : files ){
+				 UUID uu_id = UUID.randomUUID();
+				 String uuid=uu_id.toString();
+			ExtractThread thread= new ExtractThread( file,uuid);
+			extractThreads.add(thread);
+			thread.start();				
+			}
+		
+		System.out.println("Total extract thread :" + extractThreads.size());
+		int stillWorking = 1;
+		while(stillWorking>0)
+		{
+			stillWorking=0;
+			for( ExtractThread thread : extractThreads)
+			{
+				if(thread.isAlive())
+					stillWorking++;
+			}
+			System.out.println("total extract threads alive: "+stillWorking);
+			
+			try {
+			    Thread.sleep(500);
+			} catch(InterruptedException ex) {
+			    Thread.currentThread().interrupt();
+			}
+		}
 	}
 	
-	public static void list(File file) {
+	public static List<File> list(File file) {
 	    
 		if(!file.isDirectory())
 			files.add(file);		
@@ -96,6 +95,7 @@ public class indexing {
 	    for (File child : children) {
 	        list(child);
 	    }
+		return files;
 	}
 	
 	 public double tfCalculator(List<String> temps, String termToCheck,Pair pair, HashSet<Pair>words,String uuid) {
@@ -129,10 +129,12 @@ public class indexing {
 	        return count/temps.size();
 	    }
 	
-	 public void StopWords(File new_file , String uuid) throws IOException
+	 public void StopWords(List<File> files) throws IOException
 		{
 		 indexing ind=new indexing();
-				Document doc = Jsoup.parse(new_file, "UTF-8");
+		 for(File f: files){
+			 	
+				Document doc = Jsoup.parse(f, "UTF-8");
 				Element e = doc.select("body").first();
 				Pair pair = new Pair();
 				HashSet<Pair> words = new HashSet<Pair>();
@@ -140,7 +142,7 @@ public class indexing {
 				DB db = mg.getDB( "mydb" );
 				
 				DBCollection collection1=db.getCollection("indices");
-				 File newFile = new File("C:/Users/bps21/Desktop/temp/"+new_file.getName()+".txt");
+				 File newFile = new File("C:/Users/bps21/Desktop/temp/"+f.getName()+".txt");
 				 String[] ENGLISH_STOP_WORDS ={
 						    "a", "an", "and", "are","as","at","be", "but",
 						    "by", "for", "if", "in", "into", "is", "it",
@@ -149,7 +151,8 @@ public class indexing {
 						    "they", "this", "to", "was", "will", "with" };
 					String text = e.text().toLowerCase();
 					
-				
+					 UUID uu_id = UUID.randomUUID();
+					 String uuid=uu_id.toString();
 				//System.out.println(e.text());
 					 for (String s : ENGLISH_STOP_WORDS)
 					 {
@@ -196,7 +199,7 @@ public class indexing {
 				}	
 			   
 			}
-			
+		}
 		
 		
 	
