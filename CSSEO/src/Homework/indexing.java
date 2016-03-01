@@ -16,53 +16,90 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
+
 public class indexing {
+	
+	static List<File> files = new ArrayList();
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
+		
+		list(new File("C:/Temp/en/"));
+		
 		indexing index = new indexing();
 		HashSet<Pair> words = new HashSet<Pair>();
         Pair pair=index.new Pair();
-		File[] currentfolder=( new File ("C:/Users/bps21/Desktop/cacm/")).listFiles();
+		File[] currentfolder=( new File ("C:/Temp/en/articles/5/")).listFiles();
 		for(File f: currentfolder)
 		{
 		
-			index.StopWords(index.GetFolders(f));
+			
+			 UUID uuid = UUID.randomUUID();
+			 
+			 String uu_id=uuid.toString();
+			 index.StopWords(index.GetFolders(f),uu_id);
+			index.extracter(f,uu_id);
+			
+			
 		}
+		
 		}
 	 public class Pair{
 		  String element1;
-		  int element2;
+		  double element2;
+		  String uuid;
 		  
 		}
-	 public File GetFolders(File current_folder)
+		public void extracter( File file, String uuid) throws IOException
 		{
-		 
-			if(current_folder.isDirectory()){
-				String[] folders= current_folder.list();
-				for(String folder: folders)
-				{
-					 if (new File("C:/Users/bps21/Desktop/cacm/" + folder).isDirectory())
-					 {
-						 GetFolders(new File("C:/Users/bps21/Desktop/cacm/"+folder));
-					 }
-					 
-						 return (new File("C:/Users/bps21/Desktop/cacm/"+ folder)); 
-				}
-			}
-			else
-			{
-				return current_folder;
-			}
+
+			ArrayList<ExtractThread> extractThreads= new ArrayList<ExtractThread>();
+			File[] currentfolder=( new File ("C:/Temp/en/articles/5/")).listFiles();
 			//try{
-			return current_folder;
-			
-			//return null;
-			
-		}
-	 public double tfCalculator(List<String> temps, String termToCheck,Pair pair, HashSet<Pair>words) {
-	        int count = 0; 
+				
+					ExtractThread thread= new ExtractThread( file,uuid);
+					extractThreads.add(thread);
+					thread.start();				
+					
+				
+			//	System.out.println("Total extract thread :" + extractThreads.size());
+				int stillWorking = 1;
+				while(stillWorking>0)
+				{
+					stillWorking=0;
+					for( ExtractThread thread1 : extractThreads)
+					{
+						if(thread1.isAlive())
+							stillWorking++;
+					}
+					//System.out.println("total extract threads alive: "+stillWorking);
+					
+					try {
+					    Thread.sleep(500);
+					} catch(InterruptedException ex) {
+					    Thread.currentThread().interrupt();
+					}
+				}
+				
+	}
+	
+	public static void list(File file) {
+	    
+		if(!file.isDirectory())
+			files.add(file);		
+		File[] children = file.listFiles();
+	    for (File child : children) {
+	        list(child);
+	    }
+	}
+	
+	 public double tfCalculator(List<String> temps, String termToCheck,Pair pair, HashSet<Pair>words,String uuid) {
+	        double count = 0; 
 	        
 	        //to count the overall occurrence of the term termToCheck
 	        for (String s : temps) {
@@ -72,28 +109,37 @@ public class indexing {
 	            }
 	           
 	        }
+	        System.out.println(count);
+	        System.out.println((1%2));
 	        pair.element1=termToCheck;
 	        pair.element2=count;
+	        pair.uuid=uuid;
 	       words.add( pair);
-	       System.out.println(words.size());
+	      // System.out.println(words.size());
 		    for(Pair p: words)
 		       {
-		    	   System.out.println(p.element1 +" : "+ p.element2);
+		    	 //  System.out.println(p.element1 +" : "+ p.element2+"  UUID:" +p.uuid);
 		    	   
 		       }
+		    String s=count/temps.size()+"";
+		    Double d= Double.parseDouble(s);
+		    
 	        
-	       
-	        return count / temps.size();
+	       System.out.println(termToCheck +" : "+d);
+	        return count/temps.size();
 	    }
 	
-	 public void StopWords(File new_file) throws IOException
+	 public void StopWords(File new_file , String uuid) throws IOException
 		{
 		 indexing ind=new indexing();
 				Document doc = Jsoup.parse(new_file, "UTF-8");
 				Element e = doc.select("body").first();
 				Pair pair = new Pair();
 				HashSet<Pair> words = new HashSet<Pair>();
-				 UUID uuid = UUID.randomUUID();
+				MongoClient mg= new MongoClient( "localhost" , 27017);
+				DB db = mg.getDB( "mydb" );
+				
+				DBCollection collection1=db.getCollection("indices");
 				 File newFile = new File("C:/Users/bps21/Desktop/temp/"+new_file.getName()+".txt");
 				 String[] ENGLISH_STOP_WORDS ={
 						    "a", "an", "and", "are","as","at","be", "but",
@@ -132,11 +178,21 @@ public class indexing {
 					
 			    }
 			    inFile1.close();
-			   
+			   int i=1;
 			    for(String temp : temps)
 				{
-			    	
-					ind.tfCalculator(temps, temp,pair,words);
+			    	BasicDBObject document = new BasicDBObject();
+					
+					document.put("word", temp);
+					BasicDBObject document1 = new BasicDBObject();
+					document1.put("UUID", uuid);
+					document1.put("tf_score", ind.tfCalculator(temps, temp,pair,words,uuid));
+					document.put("File"+i, document1);
+					BasicDBObject query = new BasicDBObject("word",temp);
+			          
+			          collection1.update(query,document,true,false);
+			          i++;
+					
 				}	
 			   
 			}
