@@ -60,21 +60,27 @@ public class indexing {
 		{
 
 			ArrayList<ExtractThread> extractThreads= new ArrayList<ExtractThread>();
+			ArrayList<IndexThread> indexThreads= new ArrayList<IndexThread>();
 			//File[] folder = new File (currentfolder).listFiles();
 			//try{
 			MongoClient mongoClient = new MongoClient( "localhost" , 27017);
 				for(File file : files ){
 					 	UUID uu_id = UUID.randomUUID();
 					 	String uuid=uu_id.toString();
-					 	ExtractThread thread= new ExtractThread(mongoClient,file,uuid);
+					 //	indexing index=new indexing();			   
+						//index.StopWords(file,uuid);
+						IndexThread indexThread= new IndexThread(mongoClient,file,uuid);
+						indexThreads.add(indexThread);
+						indexThread.start();
+					 	/*ExtractThread thread= new ExtractThread(mongoClient,file,uuid);
 						extractThreads.add(thread);
-						thread.start();				
+						thread.start();*/				
 					}
 				
 				
 				System.out.println("Total extract thread :" + extractThreads.size());
 				int stillWorking = 1;
-				while(stillWorking>0)
+				/*while(stillWorking>0)
 				{
 					stillWorking=0;
 					for( ExtractThread thread : extractThreads)
@@ -90,7 +96,23 @@ public class indexing {
 					    Thread.currentThread().interrupt();
 					}
 				}
-				
+				*/
+				while(stillWorking>0)
+				{
+					stillWorking=0;
+					for( IndexThread thread : indexThreads)
+					{
+						if(thread.isAlive())
+							stillWorking++;
+					}
+					System.out.println("total extract threads alive: "+stillWorking);
+					
+					try {
+					    Thread.sleep(1000);
+					} catch(InterruptedException ex) {
+					    Thread.currentThread().interrupt();
+					}
+				}
 					mongoClient.close();
 				
 				
@@ -140,7 +162,18 @@ public class indexing {
 	       System.out.println(termToCheck +" : "+d);
 	        return count/temps.size();
 	    }
-	
+	 public double idfCalculator(List allTerms, String termToCheck) {
+	        double count = 0;
+	        for (String[] ss : allTerms) {
+	            for (String s : ss) {
+	                if (s.equalsIgnoreCase(termToCheck)) {
+	                    count++;
+	                    break;
+	                }
+	            }
+	        }
+	        return 1 + Math.log(allTerms.size() / count);
+	    }
 	 public void StopWords(File file,String uuid) throws IOException
 		{
 		 indexing ind=new indexing();
