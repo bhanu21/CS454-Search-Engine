@@ -34,15 +34,9 @@ public class indexing {
 		indexing index = new indexing();
 		HashSet<Pair> words = new HashSet<Pair>();
         Pair pair=index.new Pair();
-	//	File[] currentfolder=( new File ("C:/Temp/en/articles/5/")).listFiles();
+	
+		// index.StopWords(list(new File("C:/Temp/en/")));
 		
-		
-			
-			
-			 
-			 
-			// index.StopWords(list(new File("C:/Temp/en/")));
-		//System.out.println(list(new File("C:/Temp/en/")).size());
 			index.extracter(list(new File("C:/Temp/en/")));
 			
 			
