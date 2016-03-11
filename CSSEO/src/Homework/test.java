@@ -20,7 +20,7 @@ import org.jsoup.select.Elements;
 
 public class test {
 	static List<File> files = new ArrayList();
-	HashMap<String,HashSet> IncomingLinks = new HashMap<String , HashSet>();
+	static HashMap<String,HashSet> IncomingLinks = new HashMap<String , HashSet>();
 	
 	public String ChangeURL (Element e)
 	{
@@ -80,7 +80,8 @@ public static List<File> list(File file) {
 						if(c.compareToIgnoreCase(filePath.getPath())==0)
 							{
 							incomingLinks.add(b);
-						//	System.out.println(f);
+						
+						System.out.println(b);
 							}
 						}
 						}
@@ -122,12 +123,34 @@ public static List<File> list(File file) {
 
 	public static void main(String[] args) throws IOException {
 				test t=new test();
-				
-				for(File file: list(new File("C:/Temp/en/")))
+				ArrayList<RankThread> rankThreads= new ArrayList<RankThread>();
+				for(File file: list(new File("C:/Temp/en_small/")))
 						{
 							t.IncomingLinks.put(file.getPath(),t.IncominLinks(file));
+					RankThread rankThread= new RankThread(file.getPath(),file);
+					rankThreads.add(rankThread);
+					rankThread.start();
 							
 						}
+			/*	System.out.println("Total extract thread :" + rankThreads.size());
+				int stillWorking = 1;
+				while(stillWorking>0)
+				{
+					stillWorking=0;
+					for( RankThread thread : rankThreads)
+					{
+						if(thread.isAlive())
+							stillWorking++;
+					}
+					System.out.println("total extract threads alive: "+stillWorking);
+					
+					try {
+					    Thread.sleep(500);
+					} catch(InterruptedException ex) {
+					    Thread.currentThread().interrupt();
+					}
+				}*/
+				
 				for(String link: t.IncomingLinks.keySet())
 				{
 					System.out.println(link );
