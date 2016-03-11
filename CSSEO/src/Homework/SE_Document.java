@@ -17,17 +17,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 
-/**
- * Class that represents a text document
- * Keeps track of the number of times a word appears in the document, it's term frequency, and 
- * eventually, its inverse document frequency (if used with TfIdf) for finding
- * important keywords in the document
- * 
- * 
- * @author Barkin Aygun
- *
- */
-
 public class SE_Document {
 	public boolean isComplete=false;
 	public String title = null;
@@ -41,13 +30,6 @@ public class SE_Document {
 	public int sumof_n_kj;
 	double vectorlength;
 	
-	/**
-	 * Constructor for document class that is used by the parent TfIdf class
-	 * @param br Reader that loaded the text file already, used to read lines from
-	 * large documents
-	 * @param parent the TfIdf class calling this ctor
-	 * @throws IOException 
-	 */
 	public SE_Document(){
 		
 	}
@@ -145,10 +127,7 @@ public class SE_Document {
 		this.isComplete=true;
 	}
 	
-	/**
-	 * Calculates the tfidf of the words after called by the parent TfIdf class
-	 * @param parent the TfIdf class
-	 */
+
 	public void calculateTfIdf(SE_Index parent) {
 		String word;
 		SE_WordData corpusdata;
@@ -166,63 +145,4 @@ public class SE_Document {
 		vectorlength = Math.sqrt(vectorlength);
 	}
 	
-	/**
-	 * Prints every word in the document with their information:
-	 * <ul> 
-	 * <li>number of times word appears
-	 * <li>Word's term frequency (number of times it appears / total word count)
-	 * <li>Word's inverse document frequency (specifically how important it is in this document)
-	 * </ul> 
-	 */
-	public void printData() {
-		String word;
-		Double[] td;
-		for (Iterator<String> it = words.keySet().iterator(); it.hasNext(); ) {
-			word = it.next();
-			td = words.get(word);
-			System.out.println(word + "\t" + td[0] + "\t" + td[1] + "\t" + td[2]);
-		}
-	}
-	
-	/**
-	 * Gives the most important numWords words
-	 * @param numWords Number of words to return
-	 * @return String array of words
-	 */
-	public String[] bestWordList(int numWords) {
-		SortedMap<String, Double[]> sortedWords = new TreeMap<String, Double[]>(new SE_Document.ValueComparer(words));
-		sortedWords.putAll(words);
-		int counter = 0;
-		String[] bestwords = new String[numWords];
-		for (Iterator<String> it = sortedWords.keySet().iterator(); it.hasNext() && (counter < numWords); counter++) {
-			bestwords[counter] = it.next();
-		}
-		return bestwords;
-	}
-	
-	/**
-	 * Override for bestWordList with default number of words of 10
-	 * @return String array of best words
-	 */
-	public String[] bestWordList() {
-		return bestWordList(10);
-	}
-	
-	/** inner class to do sorting of the map **/
-	private static class ValueComparer implements Comparator<String> {
-		private TreeMap<String, Double[]>  _data = null;
-		public ValueComparer (TreeMap<String, Double[]> data){
-			super();
-			_data = data;
-		}
-
-         public int compare(String o1, String o2) {
-        	 double e1 = ((Double[]) _data.get(o1))[2];
-             double e2 = ((Double[]) _data.get(o2))[2];
-             if (e1 > e2) return -1;
-             if (e1 == e2) return 0;
-             if (e1 < e2) return 1;
-             return 0;
-         }
-	}
 }
