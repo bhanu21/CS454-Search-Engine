@@ -37,39 +37,29 @@ public class SE_Document {
 	}
 	public void process(String filename, SE_Index parent) throws IOException {
 		Page_Location = filename;
-		BufferedReader br;				
-		String line;
 		String word;
 		StringTokenizer tokens;
 		sumof_n_kj = 0;
 		vectorlength = 0;
 		Double[] tempdata;
 		words = new TreeMap<String, Double[]>();
-		try {
-			br = new BufferedReader(new FileReader(filename));
-			line = br.readLine();
-			while (line != null) {
-				tokens = new StringTokenizer(line, ":; \"\',.[]{}()¡!?-/%^<>");
-				while(tokens.hasMoreTokens()) {
-					word = tokens.nextToken().toLowerCase();
-					word.trim();
-					if (word.length() < 3) continue;
-					if (words.get(word) == null) {
-						tempdata = new Double[]{1.0,0.0,0.0};
-						words.put(word, tempdata);
-					}
-					else {
-						tempdata = words.get(word);
-						tempdata[0]++;
-						words.put(word,tempdata);
-					}
-					sumof_n_kj++;
-				}
-				line = br.readLine();
+		org.jsoup.nodes.Document doc = Jsoup.parse(new File(filename), "UTF-8");
+
+		tokens = new StringTokenizer(doc.body().text(), ":; \"\',.[]{}()¡!?-/%^<>");
+		while(tokens.hasMoreTokens()) {
+			word = tokens.nextToken().toLowerCase();
+			word.trim();
+			if (word.length() < 3) continue;
+			if (words.get(word) == null) {
+				tempdata = new Double[]{1.0,0.0,0.0};
+				words.put(word, tempdata);
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			else {
+				tempdata = words.get(word);
+				tempdata[0]++;
+				words.put(word,tempdata);
+			}
+			sumof_n_kj++;
 		}
 		
 		// Iterate through the words to fill their tf's
@@ -81,7 +71,7 @@ public class SE_Document {
 			parent.addWordOccurence(word,this.Page_Location);
 		}	
 		
-		org.jsoup.nodes.Document doc = Jsoup.parse(new File(filename), "UTF-8");
+		
 		title = doc.title().toString();
 		Elements linksOnPage = doc.select("a[href]");
 		Elements metas = doc.select("META");
@@ -95,8 +85,8 @@ public class SE_Document {
 				url = u.absUrl("href").toString();
 			}
 			else{
-				
-				url = parent.getFileUrl(u.attr("href"),filename);
+				if(!(new File(u.attr("href"))).exists())
+					url = parent.getFileUrl(u.attr("href"),filename);
 				outgoingLinks.add(url);
 			}
 			

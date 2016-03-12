@@ -42,7 +42,7 @@ import opennlp.tools.doccat.DocumentSample;
 
 public class SE_Index {
 	
-	static String rootFolder = "C:/Temp/en_small/";
+	static String rootFolder;
 	static List<File> files = new ArrayList();
 	public TreeMap<String, SE_Document> documents;
 	public TreeMap<String, SE_WordData> allwords; //d_j: t_i elem d_j, idf_j
@@ -107,10 +107,10 @@ public class SE_Index {
 	
 	
 	public void buildAllDocuments() {
-		String word;
+		String url;
 		for (Iterator<String> it = documents.keySet().iterator(); it.hasNext(); ) {
-			word = it.next();
-			documents.get(word).calculateTfIdf(this);
+			url = it.next();
+			documents.get(url).calculateTfIdf(this);
 		}
 	}
 	
@@ -168,18 +168,18 @@ public class SE_Index {
 	
 
 	public void addWordOccurence(String word,String doc) {
-		SE_WordData tempdata = null;
+		SE_WordData wd = null;
 		if (allwords.get(word) == null) {
-			tempdata = new SE_WordData();
-			tempdata.text = word;
-			tempdata.count = 1.0;
-			tempdata.docs.put(doc,0.0);
-			allwords.put(word, tempdata);
+			wd = new SE_WordData();
+			wd.text = word;
+			wd.count = 1.0;
+			wd.docs.put(doc,0.0);
+			allwords.put(word, wd);
 		} else {
-			tempdata = allwords.get(word);
-			tempdata.count++;
-			tempdata.docs.put(doc,0.0);
-			allwords.put(word,tempdata);
+			wd = allwords.get(word);
+			wd.count++;
+			wd.docs.put(doc,0.0);
+			allwords.put(word,wd);
 			
 		}
 	}
@@ -307,6 +307,8 @@ public class SE_Index {
 	}
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
+		
+		rootFolder = args==null||args.length==0?"c:/temp/en_small/":args[0];
 		//Test code for TfIdf
 		Date startTime = new Date();
 		SE_Index tf = new SE_Index(rootFolder);
