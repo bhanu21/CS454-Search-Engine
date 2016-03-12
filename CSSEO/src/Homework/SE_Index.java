@@ -18,8 +18,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
@@ -38,20 +42,23 @@ import opennlp.tools.doccat.DocumentSample;
 
 public class SE_Index {
 	
-	static String rootFolder = "C:/Temp/en_temp/";
+	static String rootFolder = "C:/Temp/en_small/";
 	static List<File> files = new ArrayList();
 	public TreeMap<String, SE_Document> documents;
 	public TreeMap<String, SE_WordData> allwords; //d_j: t_i elem d_j, idf_j
 	public boolean corpusUpdated;
 	public int docSize;
 	
-
+	/**
+	 * Filename filter to accept .txt files
+	 */
 	FilenameFilter filter = new FilenameFilter() {
 		public boolean accept(File dir, String name) {
 			if (name.toLowerCase().endsWith(".html")) return true;
 			return false;
 		}
-	};	
+	};
+	
 	
 	public static List<File> list(File file) {
 	    
@@ -69,20 +76,12 @@ public class SE_Index {
 		allwords = new TreeMap<String, SE_WordData>();
 		documents = new TreeMap<String, SE_Document>();
 		docSize = 0;
-		ArrayList<ExtractThread> extractThreads= new ArrayList<ExtractThread>();
-			
-		MongoClient mongoClient = new MongoClient( "localhost" , 27017);
-				
+		
 		List<File>datafolder = list(new File(foldername));
 		
 		for(File f : datafolder){
 			docSize++;
 			insertDocument(f.getPath());
-			
-			/*String uuid = UUID.randomUUID().toString();
-		 	ExtractThread thread= new ExtractThread(mongoClient,f,uuid);
-			extractThreads.add(thread);
-			thread.start();*/
 		}
 	
 		corpusUpdated = false;
@@ -93,9 +92,6 @@ public class SE_Index {
 		
 	}
 	
-	/**
-	 * Updates the corpus, going through every word and changing their frequency
-	 */
 	public void updateCorpus() {
 		String word;
 		SE_WordData corpusdata;
@@ -110,9 +106,6 @@ public class SE_Index {
 	}
 	
 	
-	/**
-	 * Calculates tf-idf of all documents in the library
-	 */
 	public void buildAllDocuments() {
 		String word;
 		for (Iterator<String> it = documents.keySet().iterator(); it.hasNext(); ) {
@@ -156,7 +149,6 @@ public class SE_Index {
 		}		
 	}
 	
-	
 	public void insertDocument(String filename) throws IOException {
 
 		SE_Document doc = null;
@@ -174,7 +166,7 @@ public class SE_Index {
 
 	}
 	
-	
+
 	public void addWordOccurence(String word,String doc) {
 		SE_WordData tempdata = null;
 		if (allwords.get(word) == null) {
@@ -211,6 +203,19 @@ public class SE_Index {
 		
 		return file.getPath()+"\\"+link.replace("/", "\\");
 	}
+	
+	public <K,V extends Comparable<? super V>> SortedSet<Map.Entry<K,V>> entriesSortedByValues(Map<K,V> map) {
+        SortedSet<Map.Entry<K,V>> sortedEntries = new TreeSet<Map.Entry<K,V>>(
+            new Comparator<Map.Entry<K,V>>() {
+                @Override public int compare(Map.Entry<K,V> e1, Map.Entry<K,V> e2) {
+                    int res = e2.getValue().compareTo(e1.getValue());
+                    return res != 0 ? res : 1; // Special fix to preserve items with equal values
+                }
+            }
+        );
+        sortedEntries.addAll(map.entrySet());
+        return sortedEntries;
+    }
 	
 	public void SaveDocuments(DB db){
 		DBCollection docCollection=db.getCollection("SE_Documents");
@@ -279,19 +284,27 @@ public class SE_Index {
 			dbDoc.put("count", wd.count);
 			dbDoc.put("idf", wd.idf);
 			
-			BasicDBList dbDocs = new BasicDBList();			
-			for(Iterator<String> docs = wd.docs.keySet().iterator(); docs.hasNext();){
-				String link = docs.next();
+			BasicDBList dbDocs = new BasicDBList();	
+			
+/*			for(Iterator<Entry<String,Double>> docs = entriesSortedByValues(wd.docs).iterator(); docs.hasNext();){
+				Entry<String,Double> doc = docs.next();
 				BasicDBObject dbDocData = new BasicDBObject();
-				dbDocData.put("url", link);
-				dbDocData.put("rank", wd.docs.get(link));
+				dbDocData.put("url", doc.getKey());
+				dbDocData.put("rank", doc.getValue());
+				dbDocs.add(dbDocData);
+			}*/
+			
+			for(Iterator<String> docs = wd.docs.keySet().iterator(); docs.hasNext();){
+				String doc = docs.next();
+				BasicDBObject dbDocData = new BasicDBObject();
+				dbDocData.put("url", doc);
+				dbDocData.put("rank", wd.docs.get(doc));
 				dbDocs.add(dbDocData);
 			}
 			dbDoc.put("docs", dbDocs);
 			docCollection.insert(dbDoc);
 		}
 	}
-	
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
 		//Test code for TfIdf
@@ -312,8 +325,13 @@ public class SE_Index {
 		mongoclient=new MongoClient("localhost" , 27017);
 		DB db = mongoclient.getDB( "mydb" );
 		
+		startTime = new Date();		
 		tf.SaveDocuments(db);
+		System.out.println("time taken in saving docs: "+((new Date()).getTime() - startTime.getTime()));
+		
+		startTime = new Date();		
 		tf.SaveWords(db);
+		System.out.println("time taken in saving words: "+((new Date()).getTime() - startTime.getTime()));
 		
 		
 		String search = "the";
@@ -324,7 +342,7 @@ public class SE_Index {
 		System.out.println("total docs word found in: "+wd.count);
 		System.out.println("-------------------------------------------------------------------");		
 		
-		for( String fileName : wd.docs.keySet())
+		/*for( String fileName : wd.docs.keySet())
 		{
 			SE_Document doc = tf.documents.get(fileName);
 			System.out.println("Page Url: "+doc.Page_Location);
@@ -335,7 +353,7 @@ public class SE_Index {
 			System.out.println("Overall Ranking: "+wd.docs.get(fileName).doubleValue());
 			System.out.println("-------------------------------------------------------------------");		
 			
-		}	
+		}	*/
 
 		
 		

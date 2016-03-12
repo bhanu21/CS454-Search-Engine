@@ -30,9 +30,8 @@ public class SE_Document {
 	public int sumof_n_kj;
 	double vectorlength;
 	
-	public SE_Document(){
-		
-	}
+	public SE_Document(){}
+	
 	public SE_Document(String filename, SE_Index parent) throws IOException {
 		process(filename,parent);
 	}
@@ -50,7 +49,7 @@ public class SE_Document {
 			br = new BufferedReader(new FileReader(filename));
 			line = br.readLine();
 			while (line != null) {
-				tokens = new StringTokenizer(line, ":; \"\',.[]{}()¡!?-/");
+				tokens = new StringTokenizer(line, ":; \"\',.[]{}()¡!?-/%^<>");
 				while(tokens.hasMoreTokens()) {
 					word = tokens.nextToken().toLowerCase();
 					word.trim();
@@ -127,7 +126,6 @@ public class SE_Document {
 		this.isComplete=true;
 	}
 	
-
 	public void calculateTfIdf(SE_Index parent) {
 		String word;
 		SE_WordData corpusdata;
