@@ -101,7 +101,7 @@ public class SearchEngine {
 		{
 			Entry<String,Double[]> link = it.next();
 			
-			if(isAnd && link.getValue()[0] < words.size()*2)
+			if(isAnd && link.getValue()[0] < words.size())
 				continue;
 			
 			
