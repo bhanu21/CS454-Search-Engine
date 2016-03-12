@@ -6,7 +6,7 @@
 String text = request.getParameter("text");
 
 SearchEngine se = new SearchEngine();
-String json = se.search(text.toLowerCase());
+String json = se.getWordsStartWith(text);
 
 response.setContentType("json");
 
