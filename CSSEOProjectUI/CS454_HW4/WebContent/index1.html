@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Search</title>
+  <style>
+  	#word-list{list-style:none;margin:0;padding:0;width:190px;}
+	#word-list li{padding: 10px; background:#FAFAFA;border-bottom:#F0F0F0 1px solid;}
+	#word-list li:hover{background:#F0F0F0;}
+	#txtSearch{padding: 10px;border: #F0F0F0 1px solid;}
+	#btnSearch{padding: 10px;border: #F0F0F0 1px solid;}
+  </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js" data-semver="2.2.0" data-require="jquery@*"></script>
+<script>
+function selectWord(val) {
+	$("#txtSearch").val(val);
+	$("#suggesstion-box").hide();
+	$("#btnSearch").click();
+}
+
+                  
+$(document).ready(function(){
+	
+	var position = $("#suggesstion-box").position(),
+	left = position.left, top = position.top;
+
+	$("#suggesstion-box > ul").css({left: left + 20 + "px",
+	                    top: top + 4 + "px" });
+	
+	$("#txtSearch").keyup(function(){
+		$.ajax({url: "getAllWords.jsp"
+			,data:{"text":$(this).val()}
+			,method: "POST"
+			,async: true
+			,beforeSend: function(){
+				$("#txtSearch").css("background","#FFF url(loaderIcon.gif) no-repeat 165px");
+			}
+			,success: function(data){
+				var html="<ul id='word-list'>";				
+				$.each(data,function(i,item){
+					html = html+"<li onClick=\"selectWord('"+item+"')\">"+item+"</li>";
+				});
+				html = html+"</ul>";
+				$("#suggesstion-box").show();
+				$("#suggesstion-box").html(html);
+				$("#txtSearch").css("background","#FFF");
+	        }	
+		});
+	});
+	
+
+	
+	$("#btnSearch").click(function(){
+		$("#suggesstion-box").hide();
+		if($("#txtSearch").val().length==0)
+			return;
+		
+		var start = new Date();
+		
+		$.ajax({url: "search.jsp"
+		,data:{"text":$("#txtSearch").val()}
+		,method: "POST"
+		,async: true
+		,beforeSend: function(){
+		}
+		,success: function(result){
+			var end = new Date();
+			var html="";
+			var count=0;
+			$.each(result,function(i,item){
+				html = html+"<li><a href='"+item.url+"'>"+item.url+"</a> (cosSimilarity: "+item.cosSimilarity+",searched word(s): "+item.count+",rating: "+item.rank+")</li>";
+				count++;
+			});
+			html = "<h2>Total results found: "+count+" in "+(end-start)+"(ms)</h2><br><ul>"+html+"</ul>";
+			$("#results").html(html);
+        }
+		,error: function (xhr, ajaxOptions, thrownError) {
+			$("#results").html(thrownError);
+	    }	
+	});
+	})
+	
+});
+
+</script>
+</head>
+<body>
+<h1 style="text-align:center">Search Engine</h1>
+<div style="text-align:center"><input id="txtSearch" placeholder="search here">
+	<button id="btnSearch">Search</button>
+</div>
+<div style="text-align:-webkit-center;padding-right:62px" id="suggesstion-box"></div>
+<div id="results">
+</div>
+</body>
+</html>

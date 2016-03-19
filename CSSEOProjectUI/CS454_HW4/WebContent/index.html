@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html ng-app="MainApp">
+
+  <head>
+    <link data-require="bootstrap@*" data-semver="3.3.5" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+    <script data-require="angular.js@*" data-semver="1.5.0" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
+    <script data-require="jquery@*" data-semver="2.2.0" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script data-require="bootstrap@*" data-semver="3.3.5" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script data-require="angular-animate@*" data-semver="1.4.3" src="https://code.angularjs.org/1.4.3/angular-animate.js"></script>
+	<script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.2.4.js"></script>
+    <!-- <link rel="stylesheet" href="style.css" /> -->
+    <script type="text/javascript" src="http://fgnass.github.io/spin.js/spin.min.js"></script>
+  	<script type="text/javascript" src="js/angular-spinner.min.js"></script>
+  	<script type="text/javascript" src="js/angular-loading-spinner.js"></script>
+    <script src="js/script.js"></script>
+  </head>
+
+  <body ng-controller="MainController" class="container">
+  	<link href="{{selectedTheme.url}}" rel="stylesheet" />
+  	<div style="float:right">
+		<div class="dropdown">
+		  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		    Themes
+		    <span class="caret"></span>
+		    <span>{{selectedTheme.name}}</span>
+		  </button>
+		  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+		  	 <li style="list-style-type: none" ng-repeat="theme in themes"><a ng-click="changeTheme(theme)">{{theme.name}}</a></li>
+		  </ul>
+		</div>
+    </div>
+    <div style="text-align:center">
+      <h1>Search Engine</h1>
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <div style="text-align:center" class="input-group">
+            <input type="text" class="form-control" ng-model="text" uib-typeahead="item for item in autoComplete($viewValue)" placeholder="search here">
+            <span class="input-group-btn">
+              <div class="btn btn-primary" ng-click="search()">
+              	<span class="glyphicon glyphicon-search"></span>
+              </div>
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3"></div>
+      </div>
+    </div>
+    <br /><span us-spinner="{radius:30, width:8, length: 16}"></span>
+    <div ng-show="results.length>0">
+      <h2>
+            Search Results in {{timeTaken}} (ms)<span class="badge" style="float:right">{{results.length}}</span>
+      </h2>
+      <br />
+      <div class="list-group">
+        <div ng-repeat="result in results" >
+	        <div class="well">
+	          <h4><a href="{{result.url}}" target="_blank">{{result.title}}</a></h4>
+	          <p class="list-group-item-heading" style="color:#EC75AB">{{result.url}}</p>
+	          <div class="row">
+		          <div class="col-sm-12">
+			          <span class="label label-success">Cos Similarity: {{result.cosSimilarity}}</span>
+			          <span class="label label-warning">Searched word(s) found: {{result.count}}</span>
+			          <span class="label label-info">Custom Ranking: {{result.rank}}</span>
+			      </div>
+	          </div>
+	        </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+</html>
