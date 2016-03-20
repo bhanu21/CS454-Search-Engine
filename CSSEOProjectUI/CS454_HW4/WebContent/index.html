@@ -7,6 +7,8 @@
     <script data-require="jquery@*" data-semver="2.2.0" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script data-require="bootstrap@*" data-semver="3.3.5" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script data-require="angular-animate@*" data-semver="1.4.3" src="https://code.angularjs.org/1.4.3/angular-animate.js"></script>
+	<link rel="stylesheet" href="https://rawgithub.com/JumpLink/angular-toggle-switch/master/style/bootstrap3/angular-toggle-switch-bootstrap-3.css" type="text/css" media="screen">
+	<script src="js/angular-toggle-switch.min.js"></script>
 	<script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.2.4.js"></script>
     <!-- <link rel="stylesheet" href="style.css" /> -->
     <script type="text/javascript" src="http://fgnass.github.io/spin.js/spin.min.js"></script>
@@ -17,6 +19,19 @@
 
   <body ng-controller="MainController" class="container">
   	<link href="{{selectedTheme.url}}" rel="stylesheet" />
+  	<div style="float:left">
+  	<toggle-switch ng-model="isCSEnabled" knob-label="Cos Similarity" style="width:250px"></toggle-switch>
+  	  	<div class="row" style="text-align:center">
+  		<div class="col-sm-4">TFIDF</div>
+  		<div class="col-sm-4">PageRank</div>
+  		<div class="col-sm-4">Title</div>
+  	</div>
+  	<div class="row">
+  		<div class="col-sm-4"><input ng-model="pTfidf" class="form-control" style="width:60px" placeholder="tfidf weightage"></div>
+  		<div class="col-sm-4"><input ng-model="pRanking" class="form-control" style="width:60px" placeholder="Page ranking weightage"></div>
+  		<div class="col-sm-4"><input ng-model="pTitle" class="form-control" style="width:60px" placeholder="Title weightage"></div>
+  	</div>
+  	</div>
   	<div style="float:right">
 		<div class="dropdown">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -32,7 +47,7 @@
     <div style="text-align:center">
       <h1>Search Engine</h1>
       <div class="row">
-        <div class="col-md-3"></div>
+        <div class="col-md-1"></div>
         <div class="col-md-6">
           <div style="text-align:center" class="input-group">
             <input type="text" class="form-control" ng-model="text" uib-typeahead="item for item in autoComplete($viewValue)" placeholder="search here">
@@ -59,7 +74,7 @@
 	          <p class="list-group-item-heading" style="color:#EC75AB">{{result.url}}</p>
 	          <div class="row">
 		          <div class="col-sm-12">
-			          <span class="label label-success">Cos Similarity: {{result.cosSimilarity}}</span>
+			          <span ng-show="isCSEnabled" class="label label-success">Cos Similarity: {{result.cosSimilarity}}</span>
 			          <span class="label label-warning">Searched word(s) found: {{result.count}}</span>
 			          <span class="label label-info">Custom Ranking: {{result.rank}}</span>
 			      </div>

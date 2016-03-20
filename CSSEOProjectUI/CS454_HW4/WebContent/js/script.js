@@ -6,13 +6,25 @@
     $scope.text ="";    
     $scope.loading = false;    
     $scope.timeTaken =0;
+    $scope.isCSEnabled = false;
+    $scope.pTfidf=0.5;
+    $scope.pRanking=0.5;
+    $scope.pTitle=0.0;
     
     $scope.results = [];
+    
+    $scope.$watch("isCSEnabled",function(value){
+    	$scope.search();
+    });
     
     $scope.search = function () {
       var start = new Date().getTime();
       $scope.loading =true;
-      $http.get("search.jsp?text=" + $scope.text)
+      $http.get("search.jsp?text=" + $scope.text
+    		  +"&isCSEnabled="+$scope.isCSEnabled
+    		  +"&pTfidf="+$scope.pTfidf
+    		  +"&pRanking="+$scope.pRanking
+    		  +"&pTitle="+$scope.pTitle)
         .then(function success(response) {
         	$scope.timeTaken = new Date().getTime() - start;
             $scope.results = response.data; 
@@ -51,14 +63,14 @@
                      { name: "United", url: "https://bootswatch.com/united/bootstrap.min.css" },
                      { name: "Yeti", url: "https://bootswatch.com/yeti/bootstrap.min.css" }
                  ]
-    $scope.selectedTheme = $scope.themes[4];
+    $scope.selectedTheme = $scope.themes[10];
 
     $scope.changeTheme = function (theme) {
         $scope.selectedTheme = theme;
     }
   }
   
-  var MainApp = angular.module("MainApp",["ngAnimate","ui.bootstrap","ngLoadingSpinner"]);
+  var MainApp = angular.module("MainApp",["ngAnimate","ui.bootstrap","ngLoadingSpinner","toggle-switch"]);
   MainApp.controller("MainController",["$scope","$http", MainController]);
   
 }());
